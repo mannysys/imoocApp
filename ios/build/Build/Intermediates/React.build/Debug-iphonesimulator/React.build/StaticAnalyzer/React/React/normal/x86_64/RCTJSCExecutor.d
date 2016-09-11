@@ -1,0 +1,23 @@
+dependencies: \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Executors/RCTJSCExecutor.mm \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Executors/RCTJSCExecutor.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Base/RCTJavaScriptExecutor.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Base/RCTBridgeModule.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Base/RCTDefines.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Base/RCTInvalidating.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Base/RCTAssert.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Base/RCTBridge+Private.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Base/RCTBridge.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Base/RCTBridgeDelegate.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Base/RCTJavaScriptLoader.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Base/RCTFrameUpdate.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Modules/RCTDevMenu.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Base/RCTLog.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Profiler/RCTProfile.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Base/RCTPerformanceLogger.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Base/RCTUtils.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Profiler/RCTJSCProfiler.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Modules/RCTRedBox.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Base/RCTErrorCustomizer.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Modules/RCTSourceCode.h \
+  /Users/shadow/Desktop/ReactNativeProject/imoocApp/node_modules/react-native/React/Executors/RCTJSCWrapper.h
