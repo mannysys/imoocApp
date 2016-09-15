@@ -11,8 +11,9 @@ module.exports = {
     },
     api: {
         base: 'http://rap.taobao.org/mockjs/7186/',
-        creations: 'api/creations',
-        up: 'api/up'
+        creations: 'api/creations', //视频列表
+        comment: 'api/comments', //评论列表
+        up: 'api/up', //点赞
     }
 
 }

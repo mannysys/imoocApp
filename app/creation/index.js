@@ -170,7 +170,7 @@ var List = React.createClass ({
                 dataSource: that.state.dataSource.cloneWithRows(cachedResults.items)
               });
             }
-          }, 20)
+          }, 0)
           
         }
       })
@@ -193,7 +193,7 @@ var List = React.createClass ({
   },
   //加载更多数据
   _fetchMoreData(){
-    // 如果是没有更多的数据了或者是已经在加载中了
+    // 如果是没有数据了或者是已经在加载中了，直接返回
     if(!this._hasMore() || this.state.isLoadingTail){
       return 
     }
@@ -235,7 +235,7 @@ var List = React.createClass ({
   },
   // ListView是基于ScrollView组件的所以它的属性同时也生效
   // automaticallyAdjustContentInsets 控制调整内容的默认true
-  // onEndReached滑动到底部触发，onEndReachedThreshold是显示一个预加载
+  // onEndReached滑动到底部触发，onEndReachedThreshold是离底部距离20dp尺寸时加载，显示一个预加载转动进度条
   // showsVerticalScrollIndicator隐藏滚动条
   render(){
     return (
@@ -302,8 +302,8 @@ var styles = StyleSheet.create({
   },
   //封面图底部容器
   itemFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: 'row',  //显示并排一行
+    justifyContent: 'space-between', //两端对齐
     backgroundColor: '#eee'
   },
 
