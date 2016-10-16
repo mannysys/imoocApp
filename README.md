@@ -1,2 +1,2 @@
 # imoocApp
-React Native / Node.js API Koa框架 / Mongodb / 狗狗配音的app
+React Native / 狗狗配音的app客户端

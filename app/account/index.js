@@ -42,7 +42,6 @@ var photoOptions = {
 var CLOUDINARY = {
   cloud_name: 'dk7g9s6hq',
   api_key: '273449438826248',
-  api_secret: 'PMq1QRZx9h_vpbG-KGq_Ic70awI',
   base: '	http://res.cloudinary.com/dk7g9s6hq',
   image: 'https://api.cloudinary.com/v1_1/dk7g9s6hq/image/upload', //图片上传地址
   video: 'https://api.cloudinary.com/v1_1/dk7g9s6hq/video/upload', //视频上传地址
@@ -114,7 +113,7 @@ var Account = React.createClass ({
       var timestamp = Date.now()
       var tags = 'app,avatar' //图片加的什么签名
       var folder = 'avatar'  //上传到图床指定目录名
-      var signatureURL = config.api.base + config.api.signature
+      var signatureURL = config.api.base2 + config.api.signature
       var accessToken = this.state.user.accessToken
       //请求给服务器返回签名
       request.post(signatureURL, {
@@ -130,11 +129,7 @@ var Account = React.createClass ({
       .then((data) => {
         if(data && data.success){
           // 生成签名
-          var signature = 'folder=' + folder + '&tags=' + tags + 
-          '&timestamp=' + timestamp + CLOUDINARY.api_secret
-          // var signature = `folder=${folder}&tags=${tags}&timestamp=${timestamp}${CLOUDINARY.api_secret}`
-          signature = sha1(signature)  
-
+          var signature = data.data  
           // post提交给图床参数
           var body = new FormData()
           body.append('folder', folder)

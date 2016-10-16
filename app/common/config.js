@@ -10,6 +10,7 @@ module.exports = {
         }
     },
     api: {
+        base2: 'http://localhost:1234/',
         base: 'http://rap.taobao.org/mockjs/7186/',
         creations: 'api/creations', //视频列表
         comment: 'api/comments', //评论列表
