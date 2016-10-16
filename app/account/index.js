@@ -38,25 +38,6 @@ var photoOptions = {
   }
 };
 
-//图床参数值
-var CLOUDINARY = {
-  cloud_name: 'dk7g9s6hq',
-  api_key: '273449438826248',
-  base: 'http://res.cloudinary.com/dk7g9s6hq',
-  image: 'https://api.cloudinary.com/v1_1/dk7g9s6hq/image/upload', //图片上传地址
-  video: 'https://api.cloudinary.com/v1_1/dk7g9s6hq/video/upload', //视频上传地址
-  audio: 'https://api.cloudinary.com/v1_1/dk7g9s6hq/audio/upload'  //音频上传地址
-}
-//拼接图片上传到图床后返回图片url
-function avatar(id, type){
-  if(id.indexOf('http') > -1){
-    return id
-  }
-  if(id.indexOf('data:image') > -1){
-    return id
-  }
-  return CLOUDINARY.base + '/' + type + '/upload/' + id
-}
 
 var Account = React.createClass ({
   
@@ -100,6 +81,21 @@ var Account = React.createClass ({
       })
 
   },
+
+  //请求给服务器端返回签名值
+  _getQiniuToken(){
+    var accessToken = this.state.user.accessToken
+    var signatureURL = config.api.base + config.api.signature
+    
+    return request.post(signatureURL, {
+        accessToken: accessToken,
+        cloud: 'qiniu'
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+      
+  },
   //调用相册选取组件
   _pickPhoto(){
     var that = this
@@ -109,51 +105,36 @@ var Account = React.createClass ({
       }
       //图像数据
       var avatarData = 'data:image/jpeg;base64,' + res.data 
+      var uri = res.uri
 
-      var timestamp = Date.now()
-      var tags = 'app,avatar' //图片加的什么签名
-      var folder = 'avatar'  //上传到图床指定目录名
-      var signatureURL = config.api.base2 + config.api.signature
-      var accessToken = this.state.user.accessToken
-     
-      //请求给服务器端返回签名值
-      request.post(signatureURL, {
-        accessToken: accessToken,
-        timestamp: timestamp,
-        folder: folder,
-        tags: tags,
-        type: 'avatar'
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-      .then((data) => {
-        if(data && data.success){
-          // 服务端返回生成签名值
-          var signature = data.data  
+      that._getQiniuToken()
+        .then((data) => {
+          if(data && data.success){
+            var token = data.data.token  // 服务端返回生成签名值
+            var key = data.data.key
 
-          // post提交给图床参数
-          var body = new FormData()
-          body.append('folder', folder)
-          body.append('signature', signature)
-          body.append('tags', tags)
-          body.append('timestamp', timestamp)
-          body.append('api_key', CLOUDINARY.api_key)
-          body.append('resource_type', 'image')
-          body.append('file', avatarData)
+            var body = new FormData() // post提交给图床参数FormData
+            body.append('token', token)
+            body.append('key', key)
+            body.append('file', {
+              type: 'image/jpeg',
+              uri: uri,
+              name: key
+            })
 
-          that._upload(body)
-        }
-      })
+            that._upload(body)
+
+          }
+        })
 
     })
+
   },
   //上传图片异步请求到图床
   _upload(body){
     var that = this
-    //实例异步请求接口
-    var xhr = new XMLHttpRequest()
-    var url = CLOUDINARY.image
+    var xhr = new XMLHttpRequest() //实例异步请求接口
+    var url = config.qiniu.upload
     
     this.setState({
       avatarUploading: true,
@@ -178,9 +159,18 @@ var Account = React.createClass ({
         console.log(e)
         console.log('parse fails')
       }
-      if(response && response.public_id){
+
+      if(response){
         var user = this.state.user
-        user.avatar = response.public_id
+
+        //来自 cloudinary 图床的
+        if(response.public_id){
+          user.avatar = response.public_id
+        }
+        //七牛的
+        if(response.key){
+          user.avatar = response.key
+        }
 
         that.setState({
           avatarUploading: false,
@@ -189,7 +179,6 @@ var Account = React.createClass ({
         })
         //头像图片上传到图床成功后，同步一下服务器上的数据
         that._asyncUser(true)
-
       }
     }
     
@@ -248,6 +237,24 @@ var Account = React.createClass ({
   _logout(){
     this.props.logout()
   },
+
+  //拼接图片上传到图床后返回图片url
+  _avatar(id, type){
+    if(id.indexOf('http') > -1){
+      return id
+    }
+    if(id.indexOf('data:image') > -1){
+      return id
+    }
+    if(id.indexOf('avatar/') > -1){
+      return config.cloudinary.base + '/' + type + '/upload/' + id
+    }
+    
+    //返回七牛上传地址
+    return 'http://of4rf89l2.bkt.clouddn.com/' + id
+
+  },
+
   render(){
     var user = this.state.user
     
@@ -261,7 +268,7 @@ var Account = React.createClass ({
         { //判断用户头像是否存在
           user.avatar
           ? <TouchableOpacity onPress={this._pickPhoto} style={styles.avatarContainer}>
-              <Image source={{uri: avatar(user.avatar, 'image')}} style={styles.avatarContainer}>
+              <Image source={{uri: this._avatar(user.avatar, 'image')}} style={styles.avatarContainer}>
                 <View style={styles.avatarBox}>
                   { //如果是true显示正在上传图片一个进度条
                     this.state.avatarUploading
@@ -271,7 +278,7 @@ var Account = React.createClass ({
                         color={'#ee735c'}
                         progress={this.state.avatarProgress} />
                     : <Image
-                        source={{uri: avatar(user.avatar, 'image')}}
+                        source={{uri: this._avatar(user.avatar, 'image')}}
                         style={styles.avatar} />
                   }
                 </View>
