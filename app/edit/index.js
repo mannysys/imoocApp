@@ -11,7 +11,10 @@ var Edit = React.createClass ({
   render(){
     return (
       <View style={styles.container}>
-        <Text>制作页面</Text>
+        <View style={styles.toolbar}>
+          <Text style={styles.toolbarTitle}>狗狗的账号</Text>
+          <Text style={styles.toolbarExtra} onPress={this._edit}>编辑</Text>
+        </View>
       </View>
     )
   }
@@ -20,19 +23,31 @@ var Edit = React.createClass ({
 var styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+  //顶部导航
+  toolbar: {
+    flexDirection: 'row',
+    paddingTop: 25,
+    paddingBottom: 12,
+    backgroundColor: '#ee735c'
   },
-  instructions: {
+  //顶部标题
+  toolbarTitle: {
+    flex: 1,
+    fontSize: 16,
+    color: '#fff',
     textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+    fontWeight: '600'
+  },
+  //用户编辑
+  toolbarExtra: {
+    position: 'absolute',
+    right: 10,
+    top: 26,
+    color: '#fff',
+    textAlign: 'right',
+    fontWeight: '600',
+    fontSize: 14
   },
 });
 
