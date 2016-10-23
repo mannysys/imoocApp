@@ -26,7 +26,7 @@ var imoocApp = React.createClass ({
   getInitialState(){
     return {
       user: null,
-      selectedTab: 'account',
+      selectedTab: 'edit',
       logined: false //用户是否登录过
     }
   },

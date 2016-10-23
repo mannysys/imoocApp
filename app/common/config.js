@@ -28,6 +28,7 @@ module.exports = {
         creations: 'api/creations', //视频列表
         comment: 'api/comments', //评论列表
         up: 'api/up', //点赞
+        video: 'api/creations/video', //保存的视频地址
         signup: 'api/u/signup',  //发送验证码
         verify: 'api/u/verify', //登录验证接口
         update: 'api/u/update', //更新用户头像接口

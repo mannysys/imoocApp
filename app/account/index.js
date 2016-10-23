@@ -89,6 +89,7 @@ var Account = React.createClass ({
     
     return request.post(signatureURL, {
         accessToken: accessToken,
+        type: 'avatar',
         cloud: 'qiniu'
       })
       .catch((err) => {
