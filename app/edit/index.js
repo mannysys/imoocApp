@@ -307,10 +307,11 @@ var Edit = React.createClass ({
     var that = this
     var tags = 'app,audio'
     var folder = 'audio'
+    var timestamp = Date.now()
 
     this._getToken({
       type: 'audio',
-      timestamp: Date.now(),
+      timestamp: timestamp,
       cloud: 'cloudinary'
     })
     .catch((err) => {
@@ -673,11 +674,13 @@ var styles = StyleSheet.create({
   previewIcon: {
     marginRight: 5,
     fontSize: 20,
-    color: '#ee735c'
+    color: '#ee735c',
+    backgroundColor: 'transparent'
   },
   previewText: {
     fontSize: 20,
-    color: '#ee735c'
+    color: '#ee735c',
+    backgroundColor: 'transparent'
   },
   //上传音频cloudinary
   uploadAudioBox: {
