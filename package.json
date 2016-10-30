@@ -12,6 +12,7 @@
     "react": "15.3.1",
     "react-addons-update": "^15.3.1",
     "react-native": "0.32.0",
+    "react-native-audio": "^1.2.1",
     "react-native-button": "^1.7.0",
     "react-native-image-picker": "^0.22.8",
     "react-native-progress": "^3.0.1",

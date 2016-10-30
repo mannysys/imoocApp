@@ -219,7 +219,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		kmSJhLoeawVx8KuzYrqTnFLflA8=
+		x7iGUJjsyoXnILI34H7ZmBQBC1o=
 		</data>
 		<key>Ionicons.ttf</key>
 		<data>
@@ -239,15 +239,15 @@
 		</data>
 		<key>PlugIns/imoocAppTests.xctest/Info.plist</key>
 		<data>
-		bHNj5H6x5rUpY7kQNsqzs3qD0rU=
+		iJSof17IVY4377DG37P3bmF+B/E=
 		</data>
 		<key>PlugIns/imoocAppTests.xctest/_CodeSignature/CodeResources</key>
 		<data>
-		Cmm+j4ATmAjKD1pDClXo8fLsFYg=
+		UqR+X+7SrHUJwv1JZIcPW8vSADg=
 		</data>
 		<key>PlugIns/imoocAppTests.xctest/imoocAppTests</key>
 		<data>
-		QXMkYxkYyD105iXrLF6qcQiVu78=
+		yxHWsfFMWeVEHiWQ0fzXjBKB6jU=
 		</data>
 		<key>Zocial.ttf</key>
 		<data>
@@ -872,33 +872,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			bHNj5H6x5rUpY7kQNsqzs3qD0rU=
+			iJSof17IVY4377DG37P3bmF+B/E=
 			</data>
 			<key>hash2</key>
 			<data>
-			/E5duEcSsrY93ih0qwtieamN9JedmNBfnjsE4jwm+64=
+			JZJRY9j8mdW5oVoxaVMXQycahjLSV5wXiLroXlb40YE=
 			</data>
 		</dict>
 		<key>PlugIns/imoocAppTests.xctest/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			Cmm+j4ATmAjKD1pDClXo8fLsFYg=
+			UqR+X+7SrHUJwv1JZIcPW8vSADg=
 			</data>
 			<key>hash2</key>
 			<data>
-			2n5u5TxszmE2z0Fd71rA/CCHJ5KF2d6bGlUl2TYcnCQ=
+			AkbVjgzES225/1/9+Nqe56UXcq3NgwbZdVlibwMO3i0=
 			</data>
 		</dict>
 		<key>PlugIns/imoocAppTests.xctest/imoocAppTests</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			QXMkYxkYyD105iXrLF6qcQiVu78=
+			yxHWsfFMWeVEHiWQ0fzXjBKB6jU=
 			</data>
 			<key>hash2</key>
 			<data>
-			GfptVJyw+kG3kT2oD6cRt+lUKyT1eHKvCUZW0WuFgwM=
+			ZE/VsH0eki9O3W9Q0R2+rnreY9LPchEMRmWJ1L/I/uA=
 			</data>
 		</dict>
 		<key>Zocial.ttf</key>
