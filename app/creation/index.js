@@ -161,14 +161,29 @@ var List = React.createClass ({
         isRefreshing: true  //显示下拉刷新进度条
       })
     }
+
+    var user = this.state.user
     request.get(config.api.base + config.api.creations, {
-      accessToken: this.state.user.accessToken,
+      accessToken: user.accessToken,
       page: page
     })
       .then((data) => {
         if(data && data.success){
           //如果返回data是空数据的话，就不用执行更新了
           if(data.data.length > 0){
+
+            //检查下这个用户是否对视频点赞过
+            data.data.map(function(item){
+              var votes = item.voted || []
+              if(votes.indexOf(user._id) > -1){
+                item.voted = true
+              }
+              else{
+                item.voted = false
+              }
+              return item
+            })
+
             var items = cachedResults.items.slice()  //拿到新列表数据
 
             if(page !== 0){

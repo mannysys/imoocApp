@@ -175,6 +175,7 @@ var Detail = React.createClass ({
             cachedResults.nextPage += 1  //每次请求页数加1
             cachedResults.items = items  //将新数据存储到cachedResults去
             cachedResults.total = data.total
+
             that.setState({
               isLoadingTail: false,
               dataSource: that.state.dataSource.cloneWithRows(cachedResults.items)
@@ -293,8 +294,10 @@ var Detail = React.createClass ({
     }, function(){
       var body = {
         accessToken: this.state.user.accessToken,
-        creation: this.state.data._id,
-        content: this.state.content
+        comment: {
+          creation: this.state.data._id,
+          content: this.state.content
+        }
       }
       var url = config.api.base + config.api.comment
 
@@ -303,13 +306,8 @@ var Detail = React.createClass ({
           if(data && data.success){
             var items = cachedResults.items.slice()
             var content = that.state.content
-            items = [{
-              content: that.state.content,
-              replyBy: {
-                avatar: 'http://dummyimage.com/640x640/8ac0c8)',
-                nickname: '狗狗狗说'
-              }
-            }].concat(items)
+
+            items = data.data.concat(items)
             cachedResults.items = items
             cachedResults.total = cachedResults.total + 1
             
