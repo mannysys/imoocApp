@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import request from '../common/request';
 import config from '../common/config';
+import util from '../common/util';
 import Detail from './detail';
 import {
   StyleSheet,
@@ -18,6 +19,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   AlertIOS,
+  AsyncStorage,
 } from 'react-native';
 
 //获取到当前屏幕可视化宽度
@@ -48,7 +50,7 @@ var Item = React.createClass({
     var body = {
       id: row._id,
       up: up ? 'yes' : 'no',
-      accessToken: 'abcee'
+      accessToken: this.props.user.accessToken
     }
 
     request.post(url, body)
@@ -75,7 +77,7 @@ var Item = React.createClass({
         <View style={styles.item}>
           <Text style={styles.title}>{row.title}</Text>
           <Image
-            source={{uri: row.thumb}}
+            source={{uri: util.thumb(row.qiniu_thumb)}}
             style={styles.thumb} >
             <Icon
               name='ios-play'
@@ -121,12 +123,30 @@ var List = React.createClass ({
   _renderRow(row){
     return <Item 
       key={row._id} 
+      user={this.state.user}
       onSelect={() => this._loadPage(row)} 
       row={row} />
   },
   // 组件安装完成后执行该方法
   componentDidMount(){
-    this._fetchData(1)  
+    var that = this
+
+    AsyncStorage.getItem('user')
+      .then((data) => {
+        var user
+        if(data){
+          user = JSON.parse(data)
+        }
+        
+        if(user && user.accessToken){
+          that.setState({
+            user: user
+          }, function(){
+            that._fetchData(1)
+          })
+        }
+      })
+     
   },
   // 请求获取api数据
   _fetchData(page){
@@ -142,23 +162,23 @@ var List = React.createClass ({
       })
     }
     request.get(config.api.base + config.api.creations, {
-      accessToken: 'abcdef',
+      accessToken: this.state.user.accessToken,
       page: page
     })
       .then((data) => {
-        if(data.success){
-          var items = cachedResults.items.slice()  //拿到新列表数据
+        if(data && data.success){
+          //如果返回data是空数据的话，就不用执行更新了
+          if(data.data.length > 0){
+            var items = cachedResults.items.slice()  //拿到新列表数据
 
-          if(page !== 0){
-            items = items.concat(data.data) //将旧数据和新数据连接起来
-            cachedResults.nextPage += 1  //每次请求页数加1
-          }else{
-            items = data.data.concat(items)
-          }
-          cachedResults.items = items  //将新数据存储到cachedResults去
-          cachedResults.total = data.total
-          
-          setTimeout(function(){
+            if(page !== 0){
+              items = items.concat(data.data) //将旧数据和新数据连接起来
+              cachedResults.nextPage += 1  //每次请求页数加1
+            }else{
+              items = data.data.concat(items)
+            }
+            cachedResults.items = items  //将新数据存储到cachedResults去
+            cachedResults.total = data.total
             if(page !== 0){
               that.setState({
                 isLoadingTail: false,
@@ -170,7 +190,8 @@ var List = React.createClass ({
                 dataSource: that.state.dataSource.cloneWithRows(cachedResults.items)
               });
             }
-          }, 0)
+          }
+          
           
         }
       })

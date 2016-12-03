@@ -5,6 +5,7 @@ import Video from 'react-native-video';
 import Button from 'react-native-button';
 import config from '../common/config';
 import request from '../common/request';
+import util from '../common/util';
 import {
   StyleSheet,
   Text,
@@ -17,6 +18,7 @@ import {
   TextInput,
   Modal,
   AlertIOS,
+  AsyncStorage,
 } from 'react-native';
 
 //获取到当前屏幕可视化宽度
@@ -133,7 +135,23 @@ var Detail = React.createClass ({
   },
   //组件安装完触发
   componentDidMount(){
-    this._fetchData()
+    var that = this
+
+    AsyncStorage.getItem('user')
+      .then((data) => {
+        var user
+        if(data){
+          user = JSON.parse(data)
+        }
+        
+        if(user && user.accessToken){
+          that.setState({
+            user: user
+          }, function(){
+            that._fetchData()
+          })
+        }
+      })
   },
   
   //请求评论列表
@@ -144,23 +162,24 @@ var Detail = React.createClass ({
     })
 
     request.get(config.api.base + config.api.comment, {
-      accessToken: 'abcdef',
-      creation: 124,
+      accessToken: this.state.user.accessToken,
+      creation: this.state.data._id,
       page: page
     })
       .then((data) => {
-        if(data.success){
-          var items = cachedResults.items.slice()  //拿到新列表数据
+        if(data && data.success){
+          if(data.data.length > 0){
+            var items = cachedResults.items.slice()  //拿到新列表数据
 
-          items = items.concat(data.data) //将旧数据和新数据连接起来
-          cachedResults.nextPage += 1  //每次请求页数加1
-          cachedResults.items = items  //将新数据存储到cachedResults去
-          cachedResults.total = data.total
-          that.setState({
-            isLoadingTail: false,
-            dataSource: that.state.dataSource.cloneWithRows(cachedResults.items)
-          });
-          
+            items = items.concat(data.data) //将旧数据和新数据连接起来
+            cachedResults.nextPage += 1  //每次请求页数加1
+            cachedResults.items = items  //将新数据存储到cachedResults去
+            cachedResults.total = data.total
+            that.setState({
+              isLoadingTail: false,
+              dataSource: that.state.dataSource.cloneWithRows(cachedResults.items)
+            });
+          }
         }
       })
       .catch((error) => {
@@ -205,7 +224,7 @@ var Detail = React.createClass ({
   _renderRow(row){
     return (
       <View key={row._id} style={styles.replyBox}>
-        <Image style={styles.replyAvatar} source={{uri: row.replyBy.avatar}}/>
+        <Image style={styles.replyAvatar} source={{uri: util.avatar(row.replyBy.avatar)}}/>
         <View style={styles.reply}>
           <Text style={styles.replyNickname}>{row.replyBy.nickname}</Text>
           <Text style={styles.replyContent}>{row.content}</Text>
@@ -238,7 +257,7 @@ var Detail = React.createClass ({
     return (
       <View style={styles.listHeader}>
         <View style={styles.infoBox}>
-          <Image style={styles.avatar} source={{uri: data.author.avatar}}/>
+          <Image style={styles.avatar} source={{uri: util.avatar(data.author.avatar)}}/>
           <View style={styles.descBox}>
             <Text style={styles.nickname}>{data.author.nickname}</Text>
             <Text style={styles.title}>{data.title}</Text>
@@ -273,8 +292,8 @@ var Detail = React.createClass ({
       isSending: true
     }, function(){
       var body = {
-        accessToken: 'abc',
-        creation: '1323',
+        accessToken: this.state.user.accessToken,
+        creation: this.state.data._id,
         content: this.state.content
       }
       var url = config.api.base + config.api.comment
@@ -338,7 +357,7 @@ var Detail = React.createClass ({
         <View style={styles.videoBox}>
           <Video
             ref='videoPlayer'
-            source={{uri: data.video}}
+            source={{uri: util.video(data.qiniu_video)}}
             style={styles.video}
             volume={5}
             paused={this.state.paused}

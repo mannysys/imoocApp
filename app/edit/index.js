@@ -7,6 +7,7 @@ import ImagePicker from 'react-native-image-picker';
 import { CountDownText } from 'react-native-sk-countdown'; //倒计时组件
 import {AudioRecorder, AudioUtils} from 'react-native-audio';
 import * as Progress from 'react-native-progress';
+import Button from 'react-native-button';
 
 import request from '../common/request';
 import config from '../common/config';
@@ -20,6 +21,8 @@ import {
   AsyncStorage,
   ProgressViewIOS,
   TouchableOpacity,
+  Modal,
+  TextInput,
 } from 'react-native';
 
 //获取到当前屏幕可视化宽度和高度
@@ -45,6 +48,15 @@ var videoOptions = {
 //初始所有状态
 var defaultState = {
   previewVideo: null,
+
+  videoId: null,
+  audioId: null,
+
+  title: '',
+  modalVisible: false,
+  publishing: false,
+  willPublish: false,
+  publishProgress: 0.2,
 
   // video upload
   video: null,
@@ -222,25 +234,52 @@ var Edit = React.createClass ({
 
         that.setState(newState)
 
-        if(type === 'video') {
-          //返回上传到七牛或者cloudinary视频数据，post请求到服务器保存数据
-          var uploadURL = config.api.base + config.api[type]
-          var accessToken = this.state.user.accessToken
-          var uploadBody = {
-            accessToken: accessToken
-          }
-          uploadBody[type] = response
-          request.post(uploadURL, uploadBody)
-          .catch((err) => {
-            console.log(err)
+        //返回上传到七牛或者cloudinary视频数据，然后post请求到服务器保存数据
+        var uploadURL = config.api.base + config.api[type]
+        var accessToken = this.state.user.accessToken
+        var uploadBody = {
+          accessToken: accessToken
+        }
+        uploadBody[type] = response
+
+        //如果是audio音频就多加一个参数videoId视频id
+        if(type === 'audio'){
+          uploadBody.videoId = that.state.videoId
+        }
+
+        request.post(uploadURL, uploadBody)
+        .catch((err) => {
+          console.log(err)
+          if(type === 'video'){
             AlertIOS.alert('视频同步出错，请重新上传！')
-          })
-          .then((data) => {
-            if(!data || !data.success){
+          }
+          else if(type === 'audio'){
+            AlertIOS.alert('音频同步出错，请重新上传！')
+          }
+        })
+        .then((data) => {
+          if(data && data.success){
+            var mediaState = {}
+
+            mediaState[type + 'Id'] = data.data
+
+            if(type === 'audio'){
+              that._showModal()
+              mediaState.willPublish = true
+            }
+            
+            that.setState(mediaState)
+          }
+          else{
+            if(type === 'video'){
               AlertIOS.alert('视频同步出错，请重新上传！')
             }
-          })
-        }
+            else if(type === 'audio'){
+              AlertIOS.alert('音频同步出错，请重新上传！')
+            }
+          }
+        })
+
       }
 
     }
@@ -365,6 +404,18 @@ var Edit = React.createClass ({
     }
 
   },
+  //关闭模态窗
+  _closeModal(){
+    this.setState({
+      modalVisible: false
+    })
+  },
+  //显示模态窗
+  _showModal(){
+    this.setState({
+      modalVisible: true
+    })
+  },
   //获取登录用户的信息，异步读取
   componentDidMount(){
     var that = this
@@ -385,7 +436,50 @@ var Edit = React.createClass ({
       //初始化音频组件
       this._initAudio()
   },
-  
+  //将当前视频和音频上传到后台
+  _submit(){
+    var that = this
+    var body = {
+      title: this.state.title,
+      videoId: this.state.videoId,
+      audioId: this.state.audioId
+    }
+
+    var creationURL = config.api.base + config.api.creations
+    var user = this.state.user
+
+    if(user && user.accessToken){
+      body.accessToken = user.accessToken
+
+      this.setState({
+        publishing: true
+      })
+      request
+        .post(creationURL, body)
+        .catch((err) => {
+          console.log(err)
+          AlertIOS.alert('视频发布失败')
+        })
+        .then((data) => {
+          if(data && data.success){
+            that._closeModal()
+            AlertIOS.alert('视频发布成功')
+            var state = _.clone(defaultState)
+
+            that.setState(state)
+          }
+          else {
+            this.setState({
+              publishing: false
+            })
+            AlertIOS.alert('视频发布失败')
+          }
+        })
+    }
+
+
+
+  },
   render(){
     return (
       <View style={styles.container}>
@@ -523,8 +617,71 @@ var Edit = React.createClass ({
                 </View>
               : null
            }
-
         </View>
+
+        <Modal
+          animationType={'slide'}
+          visible={this.state.modalVisible} >
+          <View style={styles.modalContainer}>
+            <Icon
+              name='ios-close-outline'
+              onPress={this._closeModal}
+              style={styles.closeIcon} />
+            { 
+              //如果音频传完了显示这个输入框
+              this.state.audioUploaded && !this.state.publishing
+              ? <View style={styles.fieldBox}>
+                  <TextInput
+                    placeholder={'给狗狗一句宣言吧'}
+                    style={styles.inputField}
+                    autoCapitalize={'none'}  
+                    autoCorrect={false}
+                    defaultValue={this.state.title}
+                    onChangeText={(text) => {
+                      this.setState({
+                        title: text
+                      })
+                    }}
+                  />
+                </View>
+              : null
+            }
+            { //如果显示了进度条再显示文案
+              this.state.publishing
+              ? <View style={styles.loadingBox}>
+                  <Text style={styles.loadingText}>耐心等一下，拼命为您生成专属视频中...</Text>
+                  { //即将发生的时候显示，还没有开始上传情况下
+                    this.state.willPublish
+                    ? <Text style={styles.loadingText}>正在合并视频音频...</Text>
+                    : null
+                  }
+                  { //开始上传中
+                    this.state.publishProgress > 0.3
+                    ? <Text style={styles.loadingText}>开始上传喽！...</Text>
+                    : null
+                  }
+                  <Progress.Circle 
+                    showsText={true}
+                    size={60} 
+                    color={'#ee735c'}
+                    progress={this.state.publishProgress} />
+                </View>
+              : null
+            }
+            
+            <View style={styles.submitBox} >
+              {
+                //音频上传结束,还没有开始上传视频
+                this.state.audioUploaded && !this.state.publishing
+                ? <Button
+                    style={styles.btn}
+                    onPress={this._submit}>发布视频</Button>
+                : null
+              }
+            </View>
+          </View>
+        </Modal>
+
       </View>
     )
   }
@@ -699,6 +856,65 @@ var styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 30,
     color: '#ee735c'
+  },
+  //视频合并提示浮层
+  modalContainer: {
+    width: width,
+    height: height,
+    paddingTop: 50,
+    backgroundColor: '#fff'
+  },
+  //浮层关闭按钮
+  closeIcon: {
+    position: 'absolute',
+    fontSize: 32,
+    right: 20,
+    top: 30,
+    color: '#ee735c'
+  },
+  loadingBox: {
+    width: width,
+    height: 50,
+    marginTop: 10,
+    padding: 15,
+    alignItems: 'center'
+  },
+  loadingText: {
+    marginBottom: 10,
+    textAlign: 'center',
+    color: '#333'
+  },
+  fieldBox: {
+    width: width - 40,
+    height: 36,
+    marginTop: 30,
+    marginLeft: 20,
+    marginRight: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eaeaea',
+  },
+  //表单input框
+  inputField: {
+    height: 36,
+    textAlign: 'center',
+    color: '#666',
+    fontSize: 14
+  },
+  submitBox: {
+    marginTop: 50,
+    padding: 15
+  },
+  // button按钮
+  btn: {
+      margin: 65,
+      padding: 10,
+      marginLeft: 10,
+      marginRight: 10,
+      backgroundColor: 'transparent', //透明背景色
+      borderColor: '#ee735c',
+      borderWidth: 1,
+      borderRadius: 4,
+      color: '#ee735c'
   }
 
 });

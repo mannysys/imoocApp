@@ -9,9 +9,15 @@ module.exports = {
             'Content-Type': 'application/json',
         }
     },
+    backup: {
+        avatar: 'http://res.cloudinary.com/gougou/image/upload/gougou.png'
+    },
     //上传到七牛
     qiniu: {
-        upload: 'http://upload.qiniu.com/'
+        video: 'http://ohl9unxcs.qnssl.com/',
+        thumb: 'http://ohl9unxcs.qnssl.com/',
+        avatar: 'http://of4rf89l2.bkt.clouddn.com/',
+        upload: 'http://upload.qiniu.com'
     },
     //上传到cloudinary，图床参数值
     cloudinary: {
@@ -29,6 +35,7 @@ module.exports = {
         comment: 'api/comments', //评论列表
         up: 'api/up', //点赞
         video: 'api/creations/video', //保存的视频地址
+        audio: 'api/creations/audio', //post请求提交数据到服务端保存到数据库中地址
         signup: 'api/u/signup',  //发送验证码
         verify: 'api/u/verify', //登录验证接口
         update: 'api/u/update', //更新用户头像接口
