@@ -19,14 +19,21 @@ import {
   TabBarIOS,
   Navigator,
   AsyncStorage,
+  ActivityIndicatorIOS,
+  Dimensions,
 } from 'react-native';
+
+//获取到当前屏幕可视化宽度和高度
+var width = Dimensions.get('window').width;
+var height = Dimensions.get('window').height;
 
 
 var imoocApp = React.createClass ({
   getInitialState(){
     return {
       user: null,
-      selectedTab: 'edit',
+      selectedTab: 'list',
+      booted: false,
       logined: false //用户是否登录过
     }
   },
@@ -49,7 +56,9 @@ var imoocApp = React.createClass ({
     AsyncStorage.getItem('user')
       .then((data) => {
         var user
-        var newState = {}
+        var newState = {
+          booted: true
+        }
         //将data数据json格式字符串，转换成对象
         if(data){
           user = JSON.parse(data) 
@@ -85,6 +94,14 @@ var imoocApp = React.createClass ({
    * navigator 表示将navigator对象传递给组件List
    */
   render(){
+    //如果说app 第一次启动,就显示启动画面
+    if(!this.state.booted){
+      return (
+        <View style={styles.bootPage}>
+          <ActivityIndicatorIOS color="#ee735c" />
+        </View>
+      )
+    }
     //用户没有登录，就跳到用户页面组件
     if(!this.state.logined){
       return <Login afterLogin={this._afterLogin}/>
@@ -150,16 +167,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  bootPage: {
+    width: width,
+    height: height,
+    backgroundColor: '#fff',
+    justifyContent: 'center'
+  }
+
 });
 
 AppRegistry.registerComponent('imoocApp', () => imoocApp);
