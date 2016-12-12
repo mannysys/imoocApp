@@ -3,6 +3,7 @@
  * https://github.com/facebook/react-native
  * @flow
  */
+'use strict'
 import React, { Component } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 //页面
@@ -10,6 +11,7 @@ var List = require('./app/creation/index');
 var Edit = require('./app/edit/index');
 var Account = require('./app/account/index');
 var Login = require('./app/account/login');
+var Slider = require('./app/account/slider');
 
 import {
   AppRegistry,
@@ -19,26 +21,27 @@ import {
   TabBarIOS,
   Navigator,
   AsyncStorage,
-  ActivityIndicatorIOS,
+  ActivityIndicator,
   Dimensions,
 } from 'react-native';
 
 //获取到当前屏幕可视化宽度和高度
-var width = Dimensions.get('window').width;
-var height = Dimensions.get('window').height;
-
+const {height, width} = Dimensions.get('window')
 
 var imoocApp = React.createClass ({
   getInitialState(){
     return {
       user: null,
       selectedTab: 'list',
+      entered: false,
       booted: false,
       logined: false //用户是否登录过
     }
   },
   //装载完组件调用
   componentDidMount(){
+    // AsyncStorage.removeItem('entered')
+
     this._asyncAppStatus()
   },
   //退出登录
@@ -53,15 +56,18 @@ var imoocApp = React.createClass ({
   //异步获取本地存储用户检查用户是否登录过
   _asyncAppStatus(){
     var that = this
-    AsyncStorage.getItem('user')
+
+    AsyncStorage.multiGet(['user', 'entered'])
       .then((data) => {
+        var userData = data[0][1]
+        var entered = data[1][1]
         var user
         var newState = {
           booted: true
         }
         //将data数据json格式字符串，转换成对象
-        if(data){
-          user = JSON.parse(data) 
+        if(userData){
+          user = JSON.parse(userData) 
         }
         //如果AsyncStorage本地存储有用户数据，就赋值给newState这个对象里
         if(user && user.accessToken){
@@ -70,7 +76,10 @@ var imoocApp = React.createClass ({
         }else{
           newState.logined = false
         }
-
+        //判断用户是否第一次进入app，是否显示轮播图
+        if(entered === 'yes'){
+          newState.entered = true
+        }
         that.setState(newState)
       })
   },
@@ -87,6 +96,13 @@ var imoocApp = React.createClass ({
         })
       })
   },
+  _enterSlide(){
+    this.setState({
+      entered: true
+    }, function(){
+      AsyncStorage.setItem('entered', 'yes')
+    })
+  },
   /*
    * initialRoute 初始化component 组件List
    * 从右边栏呼出（ Navigator.SceneConfigs.FloatFromRight ）
@@ -98,9 +114,13 @@ var imoocApp = React.createClass ({
     if(!this.state.booted){
       return (
         <View style={styles.bootPage}>
-          <ActivityIndicatorIOS color="#ee735c" />
+          <ActivityIndicator color="#ee735c" />
         </View>
       )
+    }
+    //轮播图
+    if(!this.state.entered){
+      return <Slider enterSlide={this._enterSlide} />
     }
     //用户没有登录，就跳到用户页面组件
     if(!this.state.logined){
